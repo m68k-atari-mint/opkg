@@ -458,7 +458,7 @@ int rm_r(const char *path)
         if (!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, ".."))
             continue;
 
-#ifdef _BSD_SOURCE
+#if defined _BSD_SOURCE && !defined __MINT__
         if (dent->d_type == DT_DIR) {
             ret = rm_r(dent->d_name);
             if (ret == -1)
