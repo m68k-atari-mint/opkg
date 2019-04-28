@@ -138,7 +138,12 @@ static int unpack_pkg_control_files(pkg_t * pkg)
     sprintf_alloc(&pkg->tmp_unpack_dir, "%s/%s-XXXXXX", opkg_config->tmp_dir,
                   pkg->name);
 
+#ifndef __MINT__
     pkg->tmp_unpack_dir = mkdtemp(pkg->tmp_unpack_dir);
+#else
+    pkg->tmp_unpack_dir = mktemp(pkg->tmp_unpack_dir);
+    if (pkg->tmp_unpack_dir != NULL) mkdir(pkg->tmp_unpack_dir, 0700);
+#endif
     if (pkg->tmp_unpack_dir == NULL) {
         opkg_perror(ERROR, "Failed to create temporary directory '%s'",
                     pkg->tmp_unpack_dir);

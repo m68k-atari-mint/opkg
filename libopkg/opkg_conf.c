@@ -769,7 +769,12 @@ int opkg_conf_load(void)
                   tmp_dir_base ? tmp_dir_base : OPKG_CONF_DEFAULT_TMP_DIR_BASE,
                   OPKG_CONF_TMP_DIR_SUFFIX);
     free(opkg_config->tmp_dir);
+#ifndef __MINT__
     opkg_config->tmp_dir = mkdtemp(tmp);
+#else
+    opkg_config->tmp_dir = mktemp(tmp);
+    if (opkg_config->tmp_dir != NULL) mkdir(opkg_config->tmp_dir, 0700);
+#endif
     if (opkg_config->tmp_dir == NULL) {
         opkg_perror(ERROR, "Creating temp dir %s failed", tmp);
         goto err3;

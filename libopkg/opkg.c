@@ -495,7 +495,12 @@ int opkg_update_package_lists(opkg_progress_callback_t progress_callback,
     }
 
     sprintf_alloc(&tmp, "%s/update-XXXXXX", opkg_config->tmp_dir);
+#ifndef __MINT__
     dtemp = mkdtemp(tmp);
+#else
+    dtemp = mktemp(tmp);
+    if (dtemp != NULL) mkdir(dtemp, 0700);
+#endif
     if (dtemp == NULL) {
         opkg_perror(ERROR, "Coundn't create temporary directory %s", tmp);
         free(tmp);

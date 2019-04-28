@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <glob.h>
 #include <fnmatch.h>
 #include <signal.h>
@@ -106,7 +107,12 @@ static int opkg_update_cmd(int argc, char **argv)
     failures = 0;
 
     sprintf_alloc(&tmp, "%s/update-XXXXXX", opkg_config->tmp_dir);
+#ifndef __MINT__
     dtemp = mkdtemp(tmp);
+#else
+    dtemp = mktemp(tmp);
+    if (dtemp != NULL) mkdir(dtemp, 0700);
+#endif
     if (dtemp == NULL) {
         opkg_perror(ERROR, "Failed to make temp dir %s", opkg_config->tmp_dir);
         return -1;
@@ -182,7 +188,12 @@ static opkg_intercept_t opkg_prep_intercepts(void)
     sprintf_alloc(&ctx->statedir, "%s/opkg-intercept-XXXXXX",
                   opkg_config->tmp_dir);
 
+#ifndef __MINT__
     dtemp = mkdtemp(ctx->statedir);
+#else
+    dtemp = mktemp(ctx->statedir);
+    if (dtemp != NULL) mkdir(dtemp, 0700);
+#endif
     if (dtemp == NULL) {
         opkg_perror(ERROR, "Failed to make temp dir %s", ctx->statedir);
         free(ctx->oldpath);
